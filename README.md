@@ -7,7 +7,7 @@ _Fast, SIMD-accelerated Adler-32 checksum computation_
 ```rust
 use adler32fast::Adler32;
 
-let mut adler32 = adler32::new();
+let mut adler32 = Adler32::new();
 adler32.update(b"foo bar baz");
 let checksum = adler32.finalize();
 ```
