@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Zac Stringham <zlstringham@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
+description = "Fast, SIMD-accelerated Adler-32 checksum computation"
+repository = "https://github.com/zlstringham/adler32fast-rs"
+readme = "README.md"
+keywords = ["checksum", "adler", "adler32", "simd", "fast"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
