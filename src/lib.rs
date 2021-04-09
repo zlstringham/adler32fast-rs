@@ -50,14 +50,14 @@ impl Adler32 {
     }
 
     #[doc(hidden)]
-    fn internal_new_baseline(initial: u32) -> Self {
+    pub fn internal_new_baseline(initial: u32) -> Self {
         Self {
             state: State::Baseline(baseline::State::new(initial)),
         }
     }
 
     #[doc(hidden)]
-    fn internal_new_specialized(initial: u32) -> Option<Self> {
+    pub fn internal_new_specialized(initial: u32) -> Option<Self> {
         if let Some(state) = specialized::State::new(initial) {
             Some(Self {
                 state: State::Specialized(state),

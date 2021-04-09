@@ -28,11 +28,22 @@ select the most optimal implementation for the current CPU feature set.
 | adler32fast (this crate)                    | 0.1.0   | baseline  |  228.52 |  4.05 |
 | adler32fast (this crate)                    | 0.1.0   | sse       |   31.04 | 30.01 |
 
+Benchmarks using [criterion](https://docs.rs/criterion) can be run on stable Rust with `cargo bench`.
+
 ## Memory Safety
 
 Due to the use of SIMD intrinsics for the optimized implementations, this crate contains some amount of `unsafe` code.
 
-TODO: Fuzz testing.
+`adler32fast` is fuzz-tested with [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz).
+(_NOTE: `cargo-fuzz` does not work on Windows, but can run under WSL._)
+
+`cargo-fuzz` currently requires the nightly toolchain.
+```
+cargo install cargo-fuzz
+rustup toolchain install nightly
+
+cargo +nightly fuzz run adler32
+```
 
 ## Credits
 
@@ -42,8 +53,6 @@ The SSE implementation has been derived from Google's [Wuffs](https://github.com
 implementation.
 
 ## TODO:
-- [] Fuzz-testing
-- [] Benchmarking
 - [] Documentation
 - [] Implement more traits on `Adler32` struct
 

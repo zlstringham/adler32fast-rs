@@ -25,5 +25,5 @@ default = ["std"]
 std = []
 
 [[bench]]
-name = "adler32_benchmark"
+name = "adler32"
 harness = false

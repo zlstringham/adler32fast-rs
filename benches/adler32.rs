@@ -6,8 +6,13 @@ fn adler32(bytes: &[u8]) {
     adler32.update_buffer(bytes);
 }
 
-fn adler32fast(bytes: &[u8]) {
-    let mut adler32 = adler32fast::Adler32::new();
+fn adler32fast_baseline(bytes: &[u8]) {
+    let mut adler32 = adler32fast::Adler32::internal_new_baseline(1);
+    adler32.update(bytes);
+}
+
+fn adler32fast_specialized(bytes: &[u8]) {
+    let mut adler32 = adler32fast::Adler32::internal_new_specialized(1).unwrap();
     adler32.update(bytes);
 }
 
@@ -18,7 +23,14 @@ fn criterion_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("adler32");
     group.throughput(Throughput::Bytes(bytes.len() as u64));
     group.bench_function("adler32", |b| b.iter(|| adler32(black_box(&bytes))));
-    group.bench_function("adler32fast", |b| b.iter(|| adler32fast(black_box(&bytes))));
+    group.bench_function("adler32fast-baseline", |b| {
+        b.iter(|| adler32fast_baseline(black_box(&bytes)))
+    });
+    if adler32fast::Adler32::internal_new_specialized(1).is_some() {
+        group.bench_function("adler32fast-specialized", |b| {
+            b.iter(|| adler32fast_specialized(black_box(&bytes)))
+        });
+    }
     group.finish();
 }
 
