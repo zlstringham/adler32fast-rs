@@ -22,11 +22,11 @@ This crate contains multiple Adler-32 implementations:
 Calling the `Adler32::new` or `Adler32::from` constructor at runtime will perform a feature detection to
 select the most optimal implementation for the current CPU feature set.
 
-| crate                                       | version | variant   | ns/iter | MB/s |
-|---------------------------------------------|---------|-----------|---------|------|
-| [adler32](https://crates.io/crates/adler32) | 1.2.0   | n/a       |    TODO | TODO |
-| adler32fast (this crate)                    | 0.1.0   | baseline  |    TODO | TODO |
-| adler32fast (this crate)                    | 0.1.0   | sse       |    TODO | TODO |
+| crate                                       | version | variant   | us/iter | GiB/s |
+|---------------------------------------------|---------|-----------|---------|-------|
+| [adler32](https://crates.io/crates/adler32) | 1.2.0   | n/a       |  232.79 |  4.00 |
+| adler32fast (this crate)                    | 0.1.0   | baseline  |  228.52 |  4.05 |
+| adler32fast (this crate)                    | 0.1.0   | sse       |   31.04 | 30.01 |
 
 ## Memory Safety
 
