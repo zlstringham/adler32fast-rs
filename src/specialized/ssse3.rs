@@ -8,7 +8,7 @@ pub struct State {
 impl State {
     #[cfg(not(feature = "std"))]
     pub fn new(initial: u32) -> Option<Self> {
-        if cfg!(target_feature = "sse2") && cfg!(target_feature = "sse4.1") {
+        if cfg!(target_feature = "ssse3") {
             // SAFETY: Ensure that all required instructions are supported by the CPU.
             Some(Self {
                 state: (initial & 0xffff, initial >> 16),
@@ -20,7 +20,7 @@ impl State {
 
     #[cfg(feature = "std")]
     pub fn new(initial: u32) -> Option<Self> {
-        if is_x86_feature_detected!("sse2") && is_x86_feature_detected!("sse4.1") {
+        if is_x86_feature_detected!("ssse3") {
             // SAFETY: Ensure that all required instructions are supported by the CPU.
             Some(Self {
                 state: (initial & 0xffff, initial >> 16),
@@ -43,7 +43,7 @@ impl State {
     }
 }
 
-#[target_feature(enable = "sse2", enable = "sse4.1")]
+#[target_feature(enable = "ssse3")]
 unsafe fn update_simd(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
     #[cfg(target_arch = "x86")]
     use core::arch::x86::*;
@@ -59,7 +59,7 @@ unsafe fn update_simd(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
 
     let chunks = buf.chunks(NMAX);
     for chunk in chunks {
-        let v_num_iterate_bytes = (buf.len() & 0xffff_ffe0) as u32;
+        let v_num_iterate_bytes = (chunk.len() & 0xffff_ffe0) as u32;
         b += a * v_num_iterate_bytes;
         let mut v_v1 = _mm_setzero_si128();
         let mut v_v2j = _mm_setzero_si128();
@@ -128,5 +128,15 @@ mod tests {
             }
             expected.hash() == actual.finalize()
         }
+    }
+
+    #[test]
+    fn sse_is_valid_for_large_input() {
+        let v = vec![100; super::NMAX * 4];
+        let mut expected = adler32::RollingAdler32::new();
+        let mut actual = super::State::new(1).expect("sse not supported");
+        expected.update_buffer(&v);
+        actual.update(&v);
+        assert_eq!(expected.hash(), actual.finalize())
     }
 }

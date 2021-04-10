@@ -2,8 +2,8 @@ use cfg_if::cfg_if;
 
 cfg_if! {
     if #[cfg(any(target_arch = "x86", target_arch = "x86_64"))] {
-        mod sse;
-        pub use sse::State;
+        mod ssse3;
+        pub use ssse3::State;
    } else {
         #[derive(Copy, Clone, Debug)]
         pub enum State {}
