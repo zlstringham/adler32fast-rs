@@ -5,7 +5,7 @@
 //!
 //! let mut adler32 = Adler32::new();
 //! adler32.update(b"foo bar baz");
-//! let checksum = adler32.finalize();
+//! let checksum = adler32.as_u32();
 //! ```
 //!
 //! ## Performance
@@ -50,19 +50,19 @@ impl Adler32 {
         Self::from(DEFAULT_INIT_STATE)
     }
 
+    /// Return the computed Adler-32 value.
+    pub fn as_u32(&self) -> u32 {
+        match self.state {
+            State::Baseline(state) => state.finalize(),
+            State::Specialized(state) => state.finalize(),
+        }
+    }
+
     /// Indicates whether the current implementation is SIMD-accelerated.
     pub fn is_simd_enabled(&self) -> bool {
         match self.state {
             State::Specialized(_) => true,
             _ => false,
-        }
-    }
-
-    /// Finalize the hash state and return the computed Adler-32 value.
-    pub fn finalize(&self) -> u32 {
-        match self.state {
-            State::Baseline(state) => state.finalize(),
-            State::Specialized(state) => state.finalize(),
         }
     }
 
@@ -116,7 +116,7 @@ impl From<u32> for Adler32 {
 
 impl Hasher for Adler32 {
     fn finish(&self) -> u64 {
-        u64::from(self.finalize())
+        u64::from(self.as_u32())
     }
 
     fn write(&mut self, bytes: &[u8]) {
@@ -126,6 +126,6 @@ impl Hasher for Adler32 {
 
 impl PartialEq<u32> for Adler32 {
     fn eq(&self, &other: &u32) -> bool {
-        self.finalize() == other
+        self.as_u32() == other
     }
 }

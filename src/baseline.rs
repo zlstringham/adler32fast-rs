@@ -64,7 +64,6 @@ fn update_16(a: &mut u32, b: &mut u32, buf: &[u8]) {
 
 #[cfg(test)]
 mod tests {
-
     quickcheck::quickcheck! {
         fn baseline_is_valid(initial: u32, buf: Vec<u8>) -> bool {
             let mut expected = adler32::RollingAdler32::from_value(initial);
