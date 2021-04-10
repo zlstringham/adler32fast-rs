@@ -1,6 +1,6 @@
 [package]
 name = "adler32fast"
-version = "1.0.3"
+version = "1.0.4"
 authors = ["Zac Stringham <zlstringham@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"

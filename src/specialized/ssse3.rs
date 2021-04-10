@@ -57,8 +57,7 @@ unsafe fn update_simd(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
     );
     let v_weights_right = _mm_set_epi8(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 
-    let chunks = buf.chunks_exact(NMAX);
-    let remainder = chunks.remainder();
+    let chunks = buf.chunks(NMAX);
     for chunk in chunks {
         let v_num_iterate_bytes = (chunk.len() & 0xffff_ffe0) as u32;
         b += a * v_num_iterate_bytes;
@@ -67,6 +66,7 @@ unsafe fn update_simd(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
         let mut v_v2k = _mm_setzero_si128();
 
         let inner_chunks = chunk.chunks_exact(32);
+        let remainder = inner_chunks.remainder();
         for inner_chunk in inner_chunks {
             let v_p_left = _mm_lddqu_si128((&inner_chunk).as_ptr() as *const __m128i);
             let v_p_right = _mm_lddqu_si128((&&inner_chunk[16..]).as_ptr() as *const __m128i);
@@ -92,10 +92,15 @@ unsafe fn update_simd(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
         v_v2 = _mm_add_epi32(v_v2, _mm_shuffle_epi32(v_v2, 78));
         b += _mm_cvtsi128_si32(v_v2) as u32;
 
-        a %= crate::baseline::BASE;
-        b %= crate::baseline::BASE;
+        let updated = if remainder.is_empty() {
+            (a % crate::baseline::BASE, b % crate::baseline::BASE)
+        } else {
+            crate::baseline::update_slow(a, b, remainder)
+        };
+        a = updated.0;
+        b = updated.1;
     }
-    crate::baseline::update_slow(a, b, remainder)
+    (a, b)
 }
 
 #[cfg(test)]
