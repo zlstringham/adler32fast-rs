@@ -22,6 +22,11 @@
 mod baseline;
 mod specialized;
 
+#[cfg(not(feature = "std"))]
+use core::hash::Hasher;
+#[cfg(feature = "std")]
+use std::hash::Hasher;
+
 const DEFAULT_INIT_STATE: u32 = 1;
 
 #[derive(Copy, Clone, Debug)]
@@ -106,5 +111,21 @@ impl From<u32> for Adler32 {
     fn from(initial: u32) -> Self {
         Self::internal_new_specialized(initial)
             .unwrap_or_else(|| Self::internal_new_baseline(initial))
+    }
+}
+
+impl Hasher for Adler32 {
+    fn finish(&self) -> u64 {
+        u64::from(self.finalize())
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        self.update(bytes);
+    }
+}
+
+impl PartialEq<u32> for Adler32 {
+    fn eq(&self, &other: &u32) -> bool {
+        self.finalize() == other
     }
 }
