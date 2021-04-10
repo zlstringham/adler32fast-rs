@@ -9,7 +9,7 @@ use adler32fast::Adler32;
 
 let mut adler32 = Adler32::new();
 adler32.update(b"foo bar baz");
-let checksum = adler32.finalize();
+let checksum = adler32.as_u32();
 ```
 
 ## Performance
