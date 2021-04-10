@@ -25,8 +25,8 @@ select the most optimal implementation for the current CPU feature set.
 | crate                                       | version | variant   | us/iter | GiB/s |
 |---------------------------------------------|---------|-----------|---------|-------|
 | [adler32](https://crates.io/crates/adler32) | 1.2.0   | n/a       |  232.79 |  4.00 |
-| adler32fast (this crate)                    | 0.1.0   | baseline  |  228.52 |  4.05 |
-| adler32fast (this crate)                    | 0.1.0   | sse       |   31.04 | 30.01 |
+| adler32fast (this crate)                    | 1.0.0   | baseline  |  228.52 |  4.05 |
+| adler32fast (this crate)                    | 1.0.0   | sse       |   31.04 | 30.01 |
 
 Benchmarks using [criterion](https://docs.rs/criterion) can be run on stable Rust with `cargo bench`.
 
