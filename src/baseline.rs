@@ -26,6 +26,7 @@ impl State {
     }
 }
 
+#[inline(always)]
 pub(crate) fn update_slow(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
     for &byte in buf {
         a += u32::from(byte);
@@ -35,18 +36,17 @@ pub(crate) fn update_slow(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
 }
 
 fn update_fast(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
-    let chunks = buf.chunks(NMAX);
+    let chunks = buf.chunks_exact(NMAX);
+    let remainder = chunks.remainder();
     for chunk in chunks {
         let inner_chunks = chunk.chunks_exact(16);
-        let remainder = inner_chunks.remainder();
         for inner_chunk in inner_chunks {
             update_16(&mut a, &mut b, inner_chunk);
         }
-        let updated = update_slow(a, b, remainder);
-        a = updated.0;
-        b = updated.1;
+        a %= BASE;
+        b %= BASE;
     }
-    (a, b)
+    update_slow(a, b, remainder)
 }
 
 #[inline(always)]
