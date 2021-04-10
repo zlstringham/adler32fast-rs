@@ -38,11 +38,11 @@ Due to the use of SIMD intrinsics for the optimized implementations, this crate 
 (_NOTE: `cargo-fuzz` does not work on Windows, but can run under WSL._)
 
 `cargo-fuzz` currently requires the nightly toolchain.
-```
-cargo install cargo-fuzz
-rustup toolchain install nightly
+```shell
+$ cargo install cargo-fuzz
+$ rustup toolchain install nightly
 
-cargo +nightly fuzz run adler32
+$ cargo +nightly fuzz run adler32
 ```
 
 ## Credits
