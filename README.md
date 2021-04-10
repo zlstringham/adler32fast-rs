@@ -30,6 +30,8 @@ select the most optimal implementation for the current CPU feature set.
 
 Benchmarks using [criterion](https://docs.rs/criterion) can be run on stable Rust with `cargo bench`.
 
+Contributions are welcomed for more SIMD variants!
+
 ## Memory Safety
 
 Due to the use of SIMD intrinsics for the optimized implementations, this crate contains some amount of `unsafe` code.
@@ -51,10 +53,6 @@ This work is based on [crc32fast](https://crates.io/crates/crc32fast) as inspira
 
 The SSE implementation has been derived from Google's [Wuffs](https://github.com/google/wuffs/tree/main/std/adler32)
 implementation.
-
-## TODO:
-- [] Documentation
-- [] Implement more traits on `Adler32` struct
 
 ## License
 
