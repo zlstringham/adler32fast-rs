@@ -102,19 +102,17 @@ unsafe fn update_simd(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
 #[cfg(test)]
 mod tests {
     quickcheck::quickcheck! {
-        fn sse_is_valid(init: u32, buf: Vec<u8>) -> bool {
-            let mut expected = adler32::RollingAdler32::from_value(init);
-            expected.update_buffer(&buf);
-
-            let mut actual = super::State::new(init).expect("sse not supported");
+        fn ssse3_is_same_as_baseline(init: u32, buf: Vec<u8>) -> bool {
+            let mut expected = crate::baseline::State::new(init);
+            let mut actual = super::State::new(init).expect("ssse3 not supported");
+            expected.update(&buf);
             actual.update(&buf);
-
-            expected.hash() == actual.finalize()
+            expected.finalize() == actual.finalize()
         }
 
-        fn sse_supports_random_alignment(init: u32, chunks: Vec<(Vec<u8>, usize)>) -> bool {
+        fn ssse3_supports_random_alignment(init: u32, chunks: Vec<(Vec<u8>, usize)>) -> bool {
             let mut expected = adler32::RollingAdler32::from_value(init);
-            let mut actual = super::State::new(init).expect("sse not supported");
+            let mut actual = super::State::new(init).expect("ssse3 not supported");
             for (chunk, mut offset) in chunks {
                 // Simulate random alignments by offsetting the slice by up to 15 bytes
                 offset &= 0xf;
@@ -131,12 +129,12 @@ mod tests {
     }
 
     #[test]
-    fn sse_is_valid_for_large_input() {
+    fn ssse3_is_valid_for_large_input() {
         let v = vec![100; super::NMAX * 4];
-        let mut expected = adler32::RollingAdler32::new();
-        let mut actual = super::State::new(1).expect("sse not supported");
-        expected.update_buffer(&v);
+        let mut expected = crate::baseline::State::new(1);
+        let mut actual = super::State::new(1).expect("ssse3 not supported");
+        expected.update(&v);
         actual.update(&v);
-        assert_eq!(expected.hash(), actual.finalize())
+        assert_eq!(expected.finalize(), actual.finalize())
     }
 }
