@@ -140,5 +140,8 @@ mod tests {
             0xd0201df6,
             b"'Invariant assertions' is the most elegant programming technique!  -Tom Szymanski",
         );
+        golden(0x86af0001, &b"\x00".repeat(100_000));
+        golden(0x79660b4d, &b"a".repeat(100_000));
+        golden(0x110588ee, &b"ABCDEFGHIJKLMNOPQRSTUVWXYZ".repeat(10_000));
     }
 }
