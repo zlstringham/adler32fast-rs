@@ -17,7 +17,7 @@ let checksum = adler32.as_u32();
 This crate contains multiple Adler-32 implementations:
 
 - A fast baseline implementation which processes up to 16 bytes per iteration
-- An optimized implementation for modern `x86`/`x86_64` using `sse` instructions
+- An optimized implementation for modern `x86`/`x86_64` using `ssse3` instructions
 
 Calling the `Adler32::new` or `Adler32::from` constructor at runtime will perform a feature detection to
 select the most optimal implementation for the current CPU feature set.
@@ -26,7 +26,7 @@ select the most optimal implementation for the current CPU feature set.
 |---------------------------------------------|---------|-----------|---------|-------|
 | [adler32](https://crates.io/crates/adler32) | 1.2.0   | n/a       |  232.79 |  4.00 |
 | adler32fast (this crate)                    | 1.0.0   | baseline  |  228.52 |  4.05 |
-| adler32fast (this crate)                    | 1.0.0   | sse       |   31.04 | 30.01 |
+| adler32fast (this crate)                    | 1.0.0   | ssse3     |   31.04 | 30.01 |
 
 Benchmarks using [criterion](https://docs.rs/criterion) can be run on stable Rust with `cargo bench`.
 
