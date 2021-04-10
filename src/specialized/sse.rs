@@ -44,7 +44,7 @@ impl State {
 }
 
 #[target_feature(enable = "sse2", enable = "sse4.1")]
-unsafe fn update_simd(mut a: u32, mut b: u32, mut buf: &[u8]) -> (u32, u32) {
+unsafe fn update_simd(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
     #[cfg(target_arch = "x86")]
     use core::arch::x86::*;
     #[cfg(target_arch = "x86_64")]
