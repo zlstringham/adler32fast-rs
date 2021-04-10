@@ -56,21 +56,20 @@ unsafe fn update_simd(mut a: u32, mut b: u32, mut buf: &[u8]) -> (u32, u32) {
         17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
     );
     let v_weights_right = _mm_set_epi8(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-    while !buf.is_empty() {
-        let mut remaining = &[0; 0][..];
-        if buf.len() > NMAX {
-            remaining = &buf[NMAX..];
-            buf = &buf[..NMAX];
-        }
+
+    let chunks = buf.chunks(NMAX);
+    for chunk in chunks {
         let v_num_iterate_bytes = (buf.len() & 0xffff_ffe0) as u32;
         b += a * v_num_iterate_bytes;
         let mut v_v1 = _mm_setzero_si128();
         let mut v_v2j = _mm_setzero_si128();
         let mut v_v2k = _mm_setzero_si128();
 
-        while buf.len() >= 32 {
-            let v_p_left = _mm_lddqu_si128((&buf).as_ptr() as *const __m128i);
-            let v_p_right = _mm_lddqu_si128((&&buf[16..]).as_ptr() as *const __m128i);
+        let inner_chunks = chunk.chunks_exact(32);
+        let remainder = inner_chunks.remainder();
+        for inner_chunk in inner_chunks {
+            let v_p_left = _mm_lddqu_si128((&inner_chunk).as_ptr() as *const __m128i);
+            let v_p_right = _mm_lddqu_si128((&&inner_chunk[16..]).as_ptr() as *const __m128i);
             v_v2j = _mm_add_epi32(v_v2j, v_v1);
             v_v1 = _mm_add_epi32(v_v1, _mm_sad_epu8(v_p_left, v_zeroes));
             v_v1 = _mm_add_epi32(v_v1, _mm_sad_epu8(v_p_right, v_zeroes));
@@ -82,7 +81,6 @@ unsafe fn update_simd(mut a: u32, mut b: u32, mut buf: &[u8]) -> (u32, u32) {
                 v_v2k,
                 _mm_madd_epi16(v_ones, _mm_maddubs_epi16(v_p_right, v_weights_right)),
             );
-            buf = &buf[32..];
         }
 
         v_v1 = _mm_add_epi32(v_v1, _mm_shuffle_epi32(v_v1, 177));
@@ -94,10 +92,9 @@ unsafe fn update_simd(mut a: u32, mut b: u32, mut buf: &[u8]) -> (u32, u32) {
         v_v2 = _mm_add_epi32(v_v2, _mm_shuffle_epi32(v_v2, 78));
         b += _mm_cvtsi128_si32(v_v2) as u32;
 
-        let updated = crate::baseline::update_slow(a, b, buf);
+        let updated = crate::baseline::update_slow(a, b, remainder);
         a = updated.0;
         b = updated.1;
-        buf = remaining;
     }
     (a, b)
 }

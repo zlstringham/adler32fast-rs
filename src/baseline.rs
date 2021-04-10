@@ -34,21 +34,17 @@ pub(crate) fn update_slow(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
     (a % BASE, b % BASE)
 }
 
-fn update_fast(mut a: u32, mut b: u32, mut buf: &[u8]) -> (u32, u32) {
-    while !buf.is_empty() {
-        let mut remaining = &[0; 0][..];
-        if buf.len() > NMAX {
-            remaining = &buf[NMAX..];
-            buf = &buf[..NMAX];
+fn update_fast(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
+    let chunks = buf.chunks(NMAX);
+    for chunk in chunks {
+        let inner_chunks = chunk.chunks_exact(16);
+        let remainder = inner_chunks.remainder();
+        for inner_chunk in inner_chunks {
+            update_16(&mut a, &mut b, inner_chunk);
         }
-        while buf.len() >= 16 {
-            update_16(&mut a, &mut b, &buf);
-            buf = &buf[16..];
-        }
-        let updated = update_slow(a, b, buf);
+        let updated = update_slow(a, b, remainder);
         a = updated.0;
         b = updated.1;
-        buf = remaining;
     }
     (a, b)
 }
