@@ -1,3 +1,22 @@
+//! ## Example
+//!
+//! ```
+//! use adler32fast::Adler32;
+//!
+//! let mut adler32 = Adler32::new();
+//! adler32.update(b"foo bar baz");
+//! let checksum = adler32.finalize();
+//! ```
+//!
+//! ## Performance
+//!
+//! This crate contains multiple Adler-32 implementations:
+//!
+//! - A fast baseline implementation which processes up to 16 bytes per iteration
+//! - An optimized implementation for modern `x86`/`x86_64` using SSE instructions
+//!
+//! Calling the `Adler32::new`/`Adler32::from` constructors at runtime will perform a feature
+//! detection to select the most optimal implementation for the current CPU feature set.
 #![cfg_attr(not(any(feature = "std", test)), no_std)]
 
 mod baseline;
@@ -12,15 +31,21 @@ enum State {
 }
 
 #[derive(Copy, Clone, Debug)]
+/// Represents an in-progress Adler-32 computation.
 pub struct Adler32 {
     state: State,
 }
 
 impl Adler32 {
+    /// Create a new `Adler32`.
+    ///
+    /// This will perform a CPU feature detection at runtime to select the most
+    /// optimal implementation for the current processor architecture.
     pub fn new() -> Self {
         Self::from(DEFAULT_INIT_STATE)
     }
 
+    /// Indicates whether the current implementation is SIMD-accelerated.
     pub fn is_simd_enabled(&self) -> bool {
         match self.state {
             State::Specialized(_) => true,
@@ -28,6 +53,7 @@ impl Adler32 {
         }
     }
 
+    /// Finalize the hash state and return the computed Adler-32 value.
     pub fn finalize(&self) -> u32 {
         match self.state {
             State::Baseline(state) => state.finalize(),
@@ -35,6 +61,7 @@ impl Adler32 {
         }
     }
 
+    /// Reset the hash state.
     pub fn reset(&mut self) {
         match self.state {
             State::Baseline(ref mut state) => state.reset(),
@@ -42,6 +69,7 @@ impl Adler32 {
         }
     }
 
+    /// Process the given byte slice and update the hash state.
     pub fn update(&mut self, buf: &[u8]) {
         match self.state {
             State::Baseline(ref mut state) => state.update(buf),
