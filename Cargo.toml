@@ -8,6 +8,7 @@ description = "Fast, SIMD-accelerated Adler-32 checksum computation"
 repository = "https://github.com/zlstringham/adler32fast-rs"
 readme = "README.md"
 keywords = ["checksum", "adler", "adler32", "simd", "fast"]
+categories = ["algorithms", "no-std"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
