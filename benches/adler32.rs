@@ -16,11 +16,36 @@ fn adler32fast_baseline(bytes: &[u8]) {
     adler32.finalize();
 }
 
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 fn adler32fast_ssse3(bytes: &[u8]) {
     let mut adler32 = adler32fast::specialized::ssse3::State::new(1).unwrap();
     adler32.update(bytes);
     adler32.finalize();
 }
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+fn adler32fast_avx2(bytes: &[u8]) {
+    let mut adler32 = adler32fast::specialized::avx2::State::new(1).unwrap();
+    adler32.update(bytes);
+    adler32.finalize();
+}
+
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+fn x86_group(group: &mut BenchmarkGroup<WallTime>, bytes: &[u8]) {
+    if adler32fast::specialized::ssse3::State::new(1).is_some() {
+        group.bench_function("adler32fast-ssse3", |b| {
+            b.iter(|| adler32fast_ssse3(black_box(&bytes)))
+        });
+    }
+    if adler32fast::specialized::avx2::State::new(1).is_some() {
+        group.bench_function("adler32fast-avx2", |b| {
+            b.iter(|| adler32fast_avx2(black_box(&bytes)))
+        });
+    }
+}
+
+#[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+fn x86_group(_: &mut BenchmarkGroup<WallTime>, _: &[u8]) {}
 
 fn bench_all(mut group: BenchmarkGroup<WallTime>, bytes: &[u8]) {
     group.throughput(Throughput::Bytes(bytes.len() as u64));
@@ -28,11 +53,7 @@ fn bench_all(mut group: BenchmarkGroup<WallTime>, bytes: &[u8]) {
     group.bench_function("adler32fast-baseline", |b| {
         b.iter(|| adler32fast_baseline(black_box(&bytes)))
     });
-    if adler32fast::specialized::ssse3::State::new(1).is_some() {
-        group.bench_function("adler32fast-ssse3", |b| {
-            b.iter(|| adler32fast_ssse3(black_box(&bytes)))
-        });
-    }
+    x86_group(&mut group, bytes);
     group.finish();
 }
 

@@ -21,6 +21,12 @@ features = ["std"]
 members = ["."]
 
 [[bin]]
+name = "avx2"
+path = "fuzz_targets/avx2.rs"
+test = false
+doc = false
+
+[[bin]]
 name = "ssse3"
 path = "fuzz_targets/ssse3.rs"
 test = false
