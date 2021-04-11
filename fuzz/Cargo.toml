@@ -21,7 +21,7 @@ features = ["std"]
 members = ["."]
 
 [[bin]]
-name = "adler32"
-path = "fuzz_targets/adler32.rs"
+name = "ssse3"
+path = "fuzz_targets/ssse3.rs"
 test = false
 doc = false

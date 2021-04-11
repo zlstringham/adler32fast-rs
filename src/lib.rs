@@ -19,8 +19,11 @@
 //! detection to select the most optimal implementation for the current CPU feature set.
 #![cfg_attr(not(any(feature = "std", test)), no_std)]
 
-mod baseline;
-mod specialized;
+// These are exported for benchmarking and fuzzing; not part of the API.
+#[doc(hidden)]
+pub mod baseline;
+#[doc(hidden)]
+pub mod specialized;
 
 #[cfg(not(feature = "std"))]
 use core::hash::Hasher;
@@ -82,22 +85,17 @@ impl Adler32 {
         }
     }
 
-    #[doc(hidden)]
-    pub fn internal_new_baseline(initial: u32) -> Self {
+    fn internal_new_baseline(initial: u32) -> Self {
         Self {
             state: State::Baseline(baseline::State::new(initial)),
         }
     }
 
     #[doc(hidden)]
-    pub fn internal_new_specialized(initial: u32) -> Option<Self> {
-        if let Some(state) = specialized::State::new(initial) {
-            Some(Self {
-                state: State::Specialized(state),
-            })
-        } else {
-            None
-        }
+    fn internal_new_specialized(initial: u32) -> Option<Self> {
+        specialized::State::new(initial).map(|state| Self {
+            state: State::Specialized(state),
+        })
     }
 }
 

@@ -44,7 +44,7 @@ Due to the use of SIMD intrinsics for the optimized implementations, this crate 
 $ cargo install cargo-fuzz
 $ rustup toolchain install nightly
 
-$ cargo +nightly fuzz run adler32
+$ cargo +nightly fuzz run ssse3
 ```
 
 ## Credits
