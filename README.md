@@ -51,7 +51,9 @@ $ cargo +nightly fuzz run ssse3
 
 This work is based on [crc32fast](https://crates.io/crates/crc32fast) as inspiration.
 
-The SSE implementation has been derived from Google's [Wuffs](https://github.com/google/wuffs/tree/main/std/adler32)
+The AVX2 implementation was derived from [simd-adler32](https://github.com/mcountryman/simd-adler32)
+
+The SSSE3 implementation has been derived from Google's [Wuffs](https://github.com/google/wuffs/tree/main/std/adler32)
 implementation.
 
 ## License
