@@ -1,5 +1,6 @@
 pub(crate) const BASE: u32 = 65521;
 const NMAX: usize = 5552;
+const CHUNK_SIZE: usize = 16;
 
 #[derive(Copy, Clone, Debug)]
 pub struct State {
@@ -35,23 +36,29 @@ pub(crate) fn update_slow(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
     (a % BASE, b % BASE)
 }
 
-fn update_fast(mut a: u32, mut b: u32, buf: &[u8]) -> (u32, u32) {
-    let chunks = buf.chunks(NMAX);
+fn update_fast<'a>(mut a: u32, mut b: u32, buf: &'a [u8]) -> (u32, u32) {
+    let chunks = buf.chunks_exact(NMAX);
+    let mut remainder = chunks.remainder();
     for chunk in chunks {
-        let inner_chunks = chunk.chunks_exact(16);
-        let remainder = inner_chunks.remainder();
-        for inner_chunk in inner_chunks {
-            update_16(&mut a, &mut b, inner_chunk);
-        }
-        let updated = if remainder.is_empty() {
-            (a % BASE, b % BASE)
-        } else {
-            update_slow(a, b, remainder)
-        };
-        a = updated.0;
-        b = updated.1;
+        add_reduce(&mut a, &mut b, chunk);
+        a %= BASE;
+        b %= BASE;
     }
-    (a, b)
+    remainder = add_reduce(&mut a, &mut b, remainder);
+    update_slow(a, b, remainder)
+}
+
+#[inline(always)]
+fn add_reduce<'a>(a: &mut u32, b: &mut u32, chunk: &'a [u8]) -> &'a [u8] {
+    if chunk.len() < CHUNK_SIZE {
+        return chunk;
+    }
+    let inner_chunks = chunk.chunks_exact(CHUNK_SIZE);
+    let remainder = inner_chunks.remainder();
+    for inner_chunk in inner_chunks {
+        update_16(a, b, inner_chunk);
+    }
+    remainder
 }
 
 #[inline(always)]
