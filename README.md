@@ -1,7 +1,7 @@
 # adler32fast
 [![adler32fast](https://img.shields.io/crates/v/adler32fast.svg)](https://crates.io/crates/adler32fast)
 [![Documentation](https://docs.rs/adler32fast/badge.svg)](https://docs.rs/adler32fast)
-[![License: MIT or Apache-2.0](https://img.shields.io/crates/l/adler32fast)](LICENSE)
+[![License: MIT or Apache-2.0](https://img.shields.io/crates/l/adler32fast)](README.md#License)
 
 _Fast, SIMD-accelerated Adler-32 checksum computation_
 
